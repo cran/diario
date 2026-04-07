@@ -16,9 +16,11 @@ diario_store_token(token)
 \description{
 This function stores the provided authentication token using the \code{keyring} package.
 If the token cannot be stored (for example, because the keyring is not accessible),
-it prints a message instead of throwing an error, and returns \code{FALSE}.
+it emits a warning instead of throwing an error, and returns \code{FALSE}.
 }
 \examples{
+\dontrun{
 # Attempt to store a token:
 diario_store_token("your-api-token")
+}
 }

@@ -2,19 +2,21 @@
 #'
 #' This function stores the provided authentication token using the `keyring` package.
 #' If the token cannot be stored (for example, because the keyring is not accessible),
-#' it prints a message instead of throwing an error, and returns \code{FALSE}.
+#' it emits a warning instead of throwing an error, and returns \code{FALSE}.
 #'
 #' @param token A character string containing the API token to be stored.
 #' @return \code{TRUE} (invisibly) if the token was stored successfully;
 #'   \code{FALSE} otherwise.
 #' @examples
+#' \dontrun{
 #' # Attempt to store a token:
 #' diario_store_token("your-api-token")
+#' }
 #' @export
 diario_store_token <- function(token) {
   # Validate the token argument
   if (!is.character(token) || length(token) != 1L || !nzchar(token)) {
-    stop("`token` must be a valid non-empty string of length 1.")
+    cli::cli_abort("{.arg token} must be a valid non-empty string of length 1.")
   }
 
   # Attempt to store the token
@@ -28,16 +30,17 @@ diario_store_token <- function(token) {
       TRUE
     },
     error = function(e) {
-      message(
-        "Could not store the token. Make sure `keyring` is accessible.\n",
-        "Underlying error: ", conditionMessage(e)
-      )
+      cli::cli_warn(c(
+        "Could not store the token.",
+        "i" = "Make sure {.pkg keyring} is accessible.",
+        "x" = "Underlying error: {conditionMessage(e)}"
+      ))
       return(FALSE)
     }
   )
 
   if (success) {
-    message("Token stored successfully.")
+    cli::cli_alert_success("Token stored successfully.")
   }
 
   invisible(success)
@@ -46,12 +49,14 @@ diario_store_token <- function(token) {
 #' Retrieve the API token for Diario
 #'
 #' This function retrieves the stored authentication token using the `keyring` package.
-#' If no valid token (or keyring) is found, it will return `NULL` and print a message
-#' in English indicating that no valid token was found.
+#' If no valid token (or keyring) is found, it will return `NULL` and emit an
+#' informational message indicating that no valid token was found.
 #'
 #' @return A character string containing the API token, or `NULL` if no valid token is found.
 #' @examples
+#' \dontrun{
 #' token <- diario_retrieve_token()
+#' }
 #' @export
 diario_retrieve_token <- function() {
   tryCatch(
@@ -61,7 +66,7 @@ diario_retrieve_token <- function() {
       token
     },
     error = function(e) {
-      message("No valid token found.")
+      cli::cli_inform("No valid token found.")
       return(NULL)
     }
   )
@@ -91,29 +96,30 @@ diario_perform_request <- function(endpoint,
 
   # Argument checks
   if (!is.character(endpoint) || length(endpoint) != 1L || !nzchar(endpoint)) {
-    stop("`endpoint` must be a valid non-empty string of length 1.")
+    cli::cli_abort("{.arg endpoint} must be a valid non-empty string of length 1.")
   }
   if (!is.character(method) || length(method) != 1L || !nzchar(method)) {
-    stop("`method` must be a valid non-empty string of length 1 (e.g., 'GET').")
+    cli::cli_abort("{.arg method} must be a valid non-empty string of length 1 (e.g., {.val GET}).")
   }
   valid_methods <- c("GET", "POST", "PUT", "PATCH", "DELETE")
   if (!toupper(method) %in% valid_methods) {
-    stop(
-      "`method` must be one of: ",
-      paste(valid_methods, collapse = ", "), "."
+    cli::cli_abort(
+      "{.arg method} must be one of {.or {.val {valid_methods}}}."
     )
   }
   if (!is.list(query)) {
-    stop("`query` must be a list of query parameters.")
+    cli::cli_abort("{.arg query} must be a list of query parameters.")
   }
   if (!is.null(body) && !is.list(body)) {
-    stop("`body` must be NULL or a list representing the JSON body.")
+    cli::cli_abort("{.arg body} must be {.code NULL} or a list representing the JSON body.")
   }
 
   # Retrieve the stored token
   token <- diario_retrieve_token()
   if (is.null(token)) {
-    message("No valid token found. Please store your token with `diario_store_token()`.")
+    cli::cli_alert_warning(
+      "No valid token found. Please store your token with {.fun diario_store_token}."
+    )
     return(invisible(NULL))
   }
 
@@ -145,7 +151,10 @@ diario_perform_request <- function(endpoint,
       req |> httr2::req_perform(verbosity = verbosity)
     },
     error = function(e) {
-      stop("Failed to perform the request.\nUnderlying error: ", conditionMessage(e))
+      cli::cli_abort(c(
+        "Failed to perform the request.",
+        "x" = "Underlying error: {conditionMessage(e)}"
+      ))
     }
   )
 
@@ -154,7 +163,7 @@ diario_perform_request <- function(endpoint,
   if (grepl("application/json", tolower(ct), fixed = TRUE)) {
     httr2::resp_body_json(response, simplifyVector = TRUE)
   } else {
-    stop("Unexpected content type: ", ct)
+    cli::cli_abort("Unexpected content type: {.val {ct}}.")
   }
 }
 
@@ -195,14 +204,11 @@ diario_get_entities <- function() {
 #' @return A tibble containing the projects data.
 #' @examples
 #' \dontrun{
-#' projects <- diario_get_projects(query = list(status = "active"))
+#' projects <- diario_get_projects()
 #' }
 #' @export
 diario_get_projects <- function() {
-  # if (!is.list(query)) {
-  #   stop("`query` must be a list of query parameters.")
-  # }
-  data <- diario_perform_request("v1/obras",  method = "GET")
+  data <- diario_perform_request("v1/obras", method = "GET")
   return(tibble::as_tibble(data))
 }
 
@@ -219,7 +225,7 @@ diario_get_projects <- function() {
 #' @export
 diario_get_project_details <- function(project_id) {
   if (!is.character(project_id) || length(project_id) != 1L || !nzchar(project_id)) {
-    stop("`project_id` must be a valid non-empty string of length 1.")
+    cli::cli_abort("{.arg project_id} must be a valid non-empty string of length 1.")
   }
 
   data <- diario_perform_request(paste0("v1/obras/", project_id), method = "GET")
@@ -239,7 +245,7 @@ diario_get_project_details <- function(project_id) {
 #' @export
 diario_get_task_list <- function(project_id) {
   if (!is.character(project_id) || length(project_id) != 1L || !nzchar(project_id)) {
-    stop("`project_id` must be a valid non-empty string of length 1.")
+    cli::cli_abort("{.arg project_id} must be a valid non-empty string of length 1.")
   }
 
   data <- diario_perform_request(
@@ -263,10 +269,10 @@ diario_get_task_list <- function(project_id) {
 #' @export
 diario_get_task_details <- function(project_id, task_id) {
   if (!is.character(project_id) || length(project_id) != 1L || !nzchar(project_id)) {
-    stop("`project_id` must be a valid non-empty string of length 1.")
+    cli::cli_abort("{.arg project_id} must be a valid non-empty string of length 1.")
   }
   if (!is.character(task_id) || length(task_id) != 1L || !nzchar(task_id)) {
-    stop("`task_id` must be a valid non-empty string of length 1.")
+    cli::cli_abort("{.arg task_id} must be a valid non-empty string of length 1.")
   }
 
   data <- diario_perform_request(
@@ -291,18 +297,19 @@ diario_get_task_details <- function(project_id, task_id) {
 #' @export
 diario_get_reports <- function(project_id, limit = 50, order = "desc") {
   if (!is.character(project_id) || length(project_id) != 1L || !nzchar(project_id)) {
-    stop("`project_id` must be a valid non-empty string of length 1.")
+    cli::cli_abort("{.arg project_id} must be a valid non-empty string of length 1.")
   }
   if (!is.numeric(limit) || length(limit) != 1L || limit < 1) {
-    stop("`limit` must be a positive numeric value of length 1.")
+    cli::cli_abort("{.arg limit} must be a positive numeric value of length 1.")
   }
   if (!is.character(order) || length(order) != 1L || !nzchar(order)) {
-    stop("`order` must be a valid non-empty string of length 1 (e.g., 'asc' or 'desc').")
+    cli::cli_abort("{.arg order} must be a valid non-empty string of length 1 (e.g., {.val asc} or {.val desc}).")
   }
 
   query <- list(limite = limit, ordem = order)
   data <- diario_perform_request(
     paste0("v1/obras/", project_id, "/relatorios"),
+    query = query,
     method = "GET"
   )
   return(tibble::as_tibble(data))
@@ -322,10 +329,10 @@ diario_get_reports <- function(project_id, limit = 50, order = "desc") {
 #' @export
 diario_get_report_details <- function(project_id, report_id) {
   if (!is.character(project_id) || length(project_id) != 1L || !nzchar(project_id)) {
-    stop("`project_id` must be a valid non-empty string of length 1.")
+    cli::cli_abort("{.arg project_id} must be a valid non-empty string of length 1.")
   }
   if (!is.character(report_id) || length(report_id) != 1L || !nzchar(report_id)) {
-    stop("`report_id` must be a valid non-empty string of length 1.")
+    cli::cli_abort("{.arg report_id} must be a valid non-empty string of length 1.")
   }
 
   data <- diario_perform_request(

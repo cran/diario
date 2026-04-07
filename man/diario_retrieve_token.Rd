@@ -11,9 +11,11 @@ A character string containing the API token, or \code{NULL} if no valid token is
 }
 \description{
 This function retrieves the stored authentication token using the \code{keyring} package.
-If no valid token (or keyring) is found, it will return \code{NULL} and print a message
-in English indicating that no valid token was found.
+If no valid token (or keyring) is found, it will return \code{NULL} and emit an
+informational message indicating that no valid token was found.
 }
 \examples{
+\dontrun{
 token <- diario_retrieve_token()
+}
 }

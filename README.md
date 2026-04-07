@@ -5,12 +5,42 @@
 
 <!-- badges: start -->
 
+![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/diario)  
+![CRAN Downloads](https://cranlogs.r-pkg.org/badges/grand-total/diario)
+  ![Devl
+Badge](https://img.shields.io/badge/devel%20version-0.1.0-blue.svg)
 <!-- badges: end -->
 
 **diario** provides a set of functions for securely storing API tokens
 and interacting with the **diariodeobras.net** system. It wraps common
 functionality (e.g., authentication, GET/POST requests) in convenient R
 functions, making it easier to integrate **Diario** within R workflows.
+
+<table class="important-banner">
+
+<tr>
+
+<td>
+
+❕️ <strong class="important-title">Disclaimer</strong><br> This package
+acts as a wrapper for the API provided by the
+<strong><a href="https://diariodeobras.net">Diário de Obras</a></strong>
+platform, which is the institution responsible for the data. To maintain
+consistency with R package development standards, all wrapper functions
+use English names and English parameter names (e.g.,
+<code>diario_store_token()</code>, <code>diario_get_projects()</code>,
+<code>diario_get_reports()</code>). However, because the source API is
+natively in Portuguese, <strong>response column names</strong> are
+returned in Portuguese, and some <strong>data values</strong> (e.g.,
+project names, task descriptions, entity names) are also in Portuguese.
+Additionally, access to the Diário de Obras API requires a valid
+<strong>authentication token</strong> provided by the platform. Requests
+without a valid token will fail.
+</td>
+
+</tr>
+
+</table>
 
 ## Installation
 

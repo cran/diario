@@ -14,6 +14,6 @@ This function retrieves a list of projects from the Diario API.
 }
 \examples{
 \dontrun{
-projects <- diario_get_projects(query = list(status = "active"))
+projects <- diario_get_projects()
 }
 }
