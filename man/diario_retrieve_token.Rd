@@ -4,15 +4,20 @@
 \alias{diario_retrieve_token}
 \title{Retrieve the API token for Diario}
 \usage{
-diario_retrieve_token()
+diario_retrieve_token(quiet = FALSE)
+}
+\arguments{
+\item{quiet}{A logical flag. If \code{TRUE}, suppresses the informational message
+emitted when no token is found. Default is \code{FALSE}.}
 }
 \value{
 A character string containing the API token, or \code{NULL} if no valid token is found.
 }
 \description{
 This function retrieves the stored authentication token using the \code{keyring} package.
-If no valid token (or keyring) is found, it will return \code{NULL} and emit an
-informational message indicating that no valid token was found.
+If no valid token (or keyring) is found, it will return \code{NULL} and (unless
+\code{quiet = TRUE}) emit an informational message indicating that no valid token
+was found.
 }
 \examples{
 \dontrun{

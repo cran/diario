@@ -1,3 +1,45 @@
+# diario 0.1.2
+
+## Bug fixes
+
+* Fixed a bug where query parameters were passed to `httr2::req_url_query()`
+  as a single list argument, which errored out ("All components of `...` must
+  be named"). They are now spliced in correctly, so `diario_get_reports()`'s
+  `limit`/`order` arguments work as documented.
+
+* All argument validators now reject missing values (`NA`). Previously
+  `nzchar(NA)` returned `TRUE`, so an `NA` token could be passed straight to
+  `keyring`, and `NA` ids could be pasted into request URLs.
+
+## Potentially breaking changes
+
+* `diario_get_task_list()` now returns the schedule items (one row per task,
+  with `_id`, `descricao`, etc.) instead of the raw API envelope. Previously
+  the summary counters were recycled across rows and the actual tasks were
+  hidden inside a nested `cronograma` column.
+
+## Improvements
+
+* `diario_perform_request()` now sends the HTTP method in upper case, matching
+  the validation, so lower-case input (e.g. `"get"`) no longer leaks through.
+
+* The API base URL is now configurable via the `diario.base_url` option,
+  making it possible to target staging environments or mock requests in tests.
+
+* HTTP errors now surface the message returned by the Diario API (via
+  `httr2::req_error()`), and empty response bodies (e.g. `204 No Content`
+  from `DELETE`) are handled gracefully instead of raising a content-type
+  error.
+
+* `diario_get_reports()` now validates that `order` is one of `"asc"` or
+  `"desc"` up front.
+
+* `diario_retrieve_token()` gained a `quiet` argument; `diario_perform_request()`
+  uses it to avoid emitting a duplicate "No valid token found" message.
+
+* Added a `testthat` test suite covering argument validation and the request
+  layer (network mocked with `httr2::with_mocked_responses()`).
+
 # diario 0.1.1
 
 ## Improvements

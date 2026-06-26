@@ -10,10 +10,14 @@ diario_get_task_list(project_id)
 \item{project_id}{A valid non-empty string with the project ID.}
 }
 \value{
-A tibble containing the task list.
+A tibble with one row per schedule item (task). Returns an empty
+tibble if the project has no tasks.
 }
 \description{
-This function retrieves the task list of a specific project by its ID.
+This function retrieves the task list (schedule, or \emph{cronograma}) of a
+specific project by its ID. The underlying API wraps the schedule items in a
+\code{cronograma} field alongside summary counters; this function returns the
+schedule items themselves as one row per task.
 }
 \examples{
 \dontrun{

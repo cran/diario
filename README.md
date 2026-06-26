@@ -7,8 +7,8 @@
 
 ![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/diario)  
 ![CRAN Downloads](https://cranlogs.r-pkg.org/badges/grand-total/diario)
-  ![Devl
-Badge](https://img.shields.io/badge/devel%20version-0.1.0-blue.svg)
+  ![Devel
+Badge](https://img.shields.io/badge/devel%20version-0.1.2-blue.svg)
 <!-- badges: end -->
 
 **diario** provides a set of functions for securely storing API tokens
@@ -22,7 +22,7 @@ functions, making it easier to integrate **Diario** within R workflows.
 
 <td>
 
-❕️ <strong class="important-title">Disclaimer</strong><br> This package
+❕ <strong class="important-title">Disclaimer</strong><br> This package
 acts as a wrapper for the API provided by the
 <strong><a href="https://diariodeobras.net">Diário de Obras</a></strong>
 platform, which is the institution responsible for the data. To maintain
@@ -75,8 +75,8 @@ diario_retrieve_token()
 
 3.  Make an authenticated request:
 
-The main workhorse is `perform_request()`, which sets up and executes an
-authenticated request to the Diario API endpoints.
+The main workhorse is `diario_perform_request()`, which sets up and
+executes an authenticated request to the Diario API endpoints.
 
 ``` r
 # Example: retrieving data from an endpoint
